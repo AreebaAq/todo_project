@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(#007bff, #000000);
+        }
+
+        #todo-container {
+            width: 800px;
+            background-color: #cfe2f3;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        #add-task-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #add-task-form label {
+            font-size: 1rem;
+            color: #343a40;
+            margin-bottom: 5px;
+        }
+
+        #add-task-form input[type="text"],
+        #add-task-form input[type="date"],
+        #add-task-form select {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        #add-task-form button {
+            padding: 12px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #add-task-form button:hover {
+            background-color: #0056b3;
+        }
+
+        #task-list {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .task-item {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-item:hover {
+            transform: scale(1.03);
+        }
+
+        .task-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .task-details {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-details span,
+        .task-details p,
+        .task-details .task-date,
+        .task-details .task-actions button {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            width: 100%;
+        }
+
+        .task-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .task-details .task-actions button {
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+            margin: 5px;
+            width: 100%;
+        }
+
+        .complete-btn,
+        .delete-btn,
+        .update-btn {
+            margin-left: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .complete-btn {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+
+        .update-btn {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .priority-label {
+            display: inline-block;
+            padding: 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            background-color: #bee5d3;
+            color: #155724;
+        }
+
+        .priority-medium {
+            background-color: #c1e2ff;
+            color: #007bff;
+        }
+
+        .priority-high {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .task-main {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .task-detail-row {
+            display: table-row;
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .task-detail-row > div {
+            display: table-cell;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .task-desc {
+            display: flex;
+            word-break: break-all;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        .task-desc > div {
+            display: table-cell;
+            padding: 15px;
+        }
+
+        .task-main .task-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .task-name {
+            flex-shrink: 0;
+             word-wrap: break-word; /* Break words to prevent expansion */
+        }
+
+        .completed-task {
+            background-color: #d3ffd3;
+            text-decoration: line-through;
+            color: #555;
+        }
+    
+    </style>
+</head>
+
+<body>
+
+    <div id="todo-container">
+        <h1>Todo App</h1>
+
+        <form id="add-task-form">
+            <label for="task">Task:</label>
+            <input type="text" id="task" name="task" required>
+
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description">
+
+            <label for="date">Due Date:</label>
+            <input type="date" id="date" name="date">
+
+            <label for="priority">Priority:</label>
+            <select id="priority" name="priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+            </select>
+
+            <label for="category">Category:</label>
+            <select id="category" name="category" class="category-dropdown">
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="study">Study</option>
+            </select>
+
+            <button type="button" onclick="addTask()">Add</button>
+        </form>
+
+        <div id="task-list">
+            <!-- Task items will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        function addTask() {
+            // Retrieve the task input, description, and date values
+            var taskInput = document.getElementById('task');
+            var priorityInput = document.getElementById('priority');
+            var categoryInput = document.getElementById('category');
+            var descriptionInput = document.getElementById('description');
+            var dateInput = document.getElementById('date');
+            var taskText = taskInput.value.trim();
+            var priority = priorityInput.value;
+            var category = categoryInput.value;
+            var descriptionText = descriptionInput.value.trim();
+            var dateText = dateInput.value;
+    
+            // Check if the input is not empty
+            if (taskText !== '') {
+                // Check if there is an active task for updating
+                var activeTask = document.querySelector('.task-item.active');
+    
+                if (activeTask) {
+                    // Update the content of the active task
+                    activeTask.querySelector('.task-name').textContent = taskText;
+                    activeTask.querySelector('.task-priority').textContent = `Priority: ${priority}`;
+                    activeTask.querySelector('.task-category').textContent = `Category: ${category}`;
+                    activeTask.querySelector('.task-date').textContent = `Due Date: ${dateText}`;
+                    activeTask.querySelector('.task-description').textContent = `Description: ${descriptionText}`;
+                    activeTask.classList.remove('active');
+                } else {
+                    // Create a new task item
+                    var taskList = document.getElementById('task-list');
+                    var newTaskItem = document.createElement('div');
+                    newTaskItem.className = 'task-item';
+    
+                    // Display the task text, description, and date
+                    newTaskItem.innerHTML = `
+                        <div class='task-main'>
+                            <div class='task-detail-row'>
+                                <div class='task-name'>${taskText}</div>
+                                <div class='task-priority'>Priority: ${priority}</div>
+                                <div class='task-category'>Category: ${category}</div>
+                                <div class='task-date'>Due Date: ${dateText}</div>
+                            </div>
+                            
+                        </div>
+                        <div class='task-desc'>
+                                <div class='task-description'>Description: ${descriptionText}</div>
+                            </div>
+                        <div class="task-actions">
+                            <button class="complete-btn" onclick="completeTask(this)">Complete</button>
+                            <button class="delete-btn" onclick="deleteTask(this)">Delete</button>
+                            <button class="update-btn" onclick="updateTask(this)">Update</button>
+                        </div>
+                    `;
+    
+                    // Append the new task item to the task list
+                    taskList.appendChild(newTaskItem);
+                }
+    
+                // Clear the task input, description, and date
+                taskInput.value = '';
+                descriptionInput.value = '';
+                dateInput.value = '';
+            }
+        }
+    
+        function completeTask(button) {
+            console.log('Complete button clicked'); 
+            var taskItem = button.closest('.task-item');
+            taskItem.classList.toggle('completed-task');
+            // // Add your code to handle task completion
+        }
+    
+        function deleteTask(button) {
+            var taskItem = button.closest('.task-item');
+            taskItem.remove();
+        }
+    
+        function updateTask(button) {
+            var taskItem = button.closest('.task-item');
+            var taskName = taskItem.querySelector('.task-name').textContent;
+            var taskPriority = taskItem.querySelector('.task-priority').textContent;
+            var taskCategory = taskItem.querySelector('.task-category').textContent;
+            var taskDate = taskItem.querySelector('.task-date').textContent;
+            var taskDescription = taskItem.querySelector('.task-description').textContent;
+    
+            // Set values in the form for updating
+            document.getElementById('task').value = taskName;
+            document.getElementById('priority').value = taskPriority.replace('Priority: ', '').toLowerCase();
+            document.getElementById('category').value = taskCategory.replace('Category: ', '').toLowerCase();
+            document.getElementById('date').value = taskDate.replace('Due Date: ', '');
+            document.getElementById('description').value = taskDescription.replace('Description: ', '');
+    
+            // Mark the task as active for updating
+            taskItem.classList.add('active');
+        }
+    </script>
+    
+
+</body>
+
+</html>
